@@ -59,13 +59,16 @@ input[type="range"].nf-slider::-moz-range-thumb {
  * rotation/scale to the group's own bounding box, transform-origin is set
  * inline per group so we can hinge from shoulder, hip, etc.
  *
+ * Tone: subtle, calm. Amplitudes are intentionally small and timings slow
+ * so the figure breathes rather than dances.
+ *
  * Respect prefers-reduced-motion — animations stop, gentle pulse remains
  * via opacity only.
  */
 .nf-svg [data-anim] {
   transform-box: fill-box;
   transform-origin: var(--origin, 50% 50%);
-  animation-duration: 3.2s;
+  animation-duration: 4.2s;
   animation-iteration-count: infinite;
   animation-timing-function: ease-in-out;
   will-change: transform, opacity;
@@ -74,28 +77,27 @@ input[type="range"].nf-slider::-moz-range-thumb {
 /* Active-muscle pulse — runs alongside motion */
 .nf-svg [data-active="true"] {
   animation-name: nf-pulse;
-  animation-duration: 2.8s;
+  animation-duration: 3.4s;
   animation-iteration-count: infinite;
   animation-timing-function: ease-in-out;
 }
 
 @keyframes nf-pulse {
-  0%, 100% { opacity: 0.55; }
+  0%, 100% { opacity: 0.7; }
   50%      { opacity: 1; }
 }
 
-/* PRESS — push movement (bench, push-up): forearms extend forward
-   We translate the forearm groups along Y to mimic extension. */
+/* PRESS — push movement (bench, push-up): forearms gently extend */
 .nf-motion-press [data-anim="forearm-l"],
 .nf-motion-press [data-anim="forearm-r"] {
   animation-name: nf-press;
 }
 @keyframes nf-press {
   0%, 100% { transform: translateY(0) scaleY(1); }
-  50%      { transform: translateY(-10px) scaleY(0.9); }
+  50%      { transform: translateY(-6px) scaleY(0.93); }
 }
 
-/* SQUAT — bilateral knee/hip flexion: shorten thighs + drop torso */
+/* SQUAT — bilateral knee/hip flexion: gently shorten thighs + drop torso */
 .nf-motion-squat [data-anim="torso"] {
   animation-name: nf-squat-torso;
 }
@@ -105,31 +107,31 @@ input[type="range"].nf-slider::-moz-range-thumb {
 }
 @keyframes nf-squat-torso {
   0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(14px); }
+  50%      { transform: translateY(8px); }
 }
 @keyframes nf-squat-thigh {
   0%, 100% { transform: scaleY(1); }
-  50%      { transform: scaleY(0.78); }
+  50%      { transform: scaleY(0.86); }
 }
 
-/* HINGE — hip hinge (deadlift, RDL): torso rotates forward */
+/* HINGE — hip hinge (deadlift, RDL): gentle torso rotation */
 .nf-motion-hinge [data-anim="torso"] {
   animation-name: nf-hinge;
   --origin: 50% 100%;
 }
 @keyframes nf-hinge {
   0%, 100% { transform: rotate(0deg); }
-  50%      { transform: rotate(-22deg); }
+  50%      { transform: rotate(-14deg); }
 }
 
-/* ROW — pull movement: forearms retract, lats highlight */
+/* ROW — pull movement: forearms retract */
 .nf-motion-row [data-anim="forearm-l"],
 .nf-motion-row [data-anim="forearm-r"] {
   animation-name: nf-row;
 }
 @keyframes nf-row {
   0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(8px) scaleY(0.85); }
+  50%      { transform: translateY(5px) scaleY(0.9); }
 }
 
 /* FLEXION — spine flexion/extension (cat–cow, dead bug) */
@@ -139,31 +141,33 @@ input[type="range"].nf-slider::-moz-range-thumb {
 }
 @keyframes nf-flexion {
   0%, 100% { transform: skewY(0deg); }
-  50%      { transform: skewY(4deg); }
+  50%      { transform: skewY(2.5deg); }
 }
 
 /* WALK — alternating leg sway */
 .nf-motion-walk [data-anim="thigh-l"] {
   animation-name: nf-walk-l;
+  animation-duration: 1.8s;
 }
 .nf-motion-walk [data-anim="thigh-r"] {
   animation-name: nf-walk-r;
+  animation-duration: 1.8s;
 }
 .nf-motion-walk [data-anim="upperarm-l"] {
   animation-name: nf-walk-r;
-  animation-duration: 1.6s;
+  animation-duration: 1.8s;
 }
 .nf-motion-walk [data-anim="upperarm-r"] {
   animation-name: nf-walk-l;
-  animation-duration: 1.6s;
+  animation-duration: 1.8s;
 }
 @keyframes nf-walk-l {
-  0%, 100% { transform: rotate(-10deg); }
-  50%      { transform: rotate(10deg); }
+  0%, 100% { transform: rotate(-6deg); }
+  50%      { transform: rotate(6deg); }
 }
 @keyframes nf-walk-r {
-  0%, 100% { transform: rotate(10deg); }
-  50%      { transform: rotate(-10deg); }
+  0%, 100% { transform: rotate(6deg); }
+  50%      { transform: rotate(-6deg); }
 }
 .nf-motion-walk [data-anim="thigh-l"],
 .nf-motion-walk [data-anim="thigh-r"],
@@ -172,14 +176,14 @@ input[type="range"].nf-slider::-moz-range-thumb {
   --origin: 50% 0%;
 }
 
-/* HOLD — isometric, breathing */
+/* HOLD — isometric, gentle breathing */
 .nf-motion-hold [data-anim="torso"] {
   animation-name: nf-breathe;
-  animation-duration: 4s;
+  animation-duration: 4.6s;
 }
 @keyframes nf-breathe {
   0%, 100% { transform: scale(1); }
-  50%      { transform: scale(1.03); }
+  50%      { transform: scale(1.02); }
 }
 
 /* STILL — body static, only the active-muscle pulse runs */
