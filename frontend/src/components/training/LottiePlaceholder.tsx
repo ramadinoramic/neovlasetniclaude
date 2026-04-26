@@ -1,34 +1,38 @@
 "use client";
 
-import type { MuscleGroup } from "@/data/exercises";
+import type { MotionPattern, MuscleGroup } from "@/data/exercises";
 import { cn } from "@/lib/cn";
 
 /**
  * Privremeni placeholder za 3D Lottie animaciju.
- * Renderira neutralnu prozirnu siluetu (front view) s označenim
- * primarnim mišićima u mint boji. Bez bildanih proporcija.
+ * Renderira neutralnu prozirnu siluetu (front view) sa segmentima koji se
+ * pomiču po tipu pokreta (`motion`). Aktivni mišići se boje mintom i pulsiraju.
  *
- * Kada Lottie JSON datoteke budu spremne, ova komponenta se zamijeni
- * @lottiefiles/react-lottie-player Player-om, a `lottieFile` će se učitavati.
+ * Animacije žive u globals.css (.nf-motion-*). Kad Lottie JSON-i budu spremni,
+ * cijela komponenta se zamijeni @lottiefiles/react-lottie-player Player-om.
  */
 
 interface LottiePlaceholderProps {
   muscles: MuscleGroup[];
-  /** Display name — only for accessibility. */
+  motion: MotionPattern;
   exerciseName: string;
   className?: string;
 }
 
-const ACTIVE = "fill-mint/45 stroke-mint";
-const IDLE = "fill-charcoal-line/40 stroke-ash-600/60";
+const ACTIVE_FILL = "fill-mint/55 stroke-mint";
+const IDLE_FILL = "fill-charcoal-line/40 stroke-ash-600/60";
 
 export function LottiePlaceholder({
   muscles,
+  motion,
   exerciseName,
   className,
 }: LottiePlaceholderProps) {
   const isActive = (m: MuscleGroup) =>
     muscles.includes(m) || muscles.includes("full_body");
+
+  const muscleClass = (m: MuscleGroup) =>
+    cn(isActive(m) ? ACTIVE_FILL : IDLE_FILL);
 
   return (
     <div
@@ -40,133 +44,187 @@ export function LottiePlaceholder({
       aria-label={`Vizualni prikaz vježbe: ${exerciseName}`}
     >
       <span className="absolute left-3 top-3 rounded-full border border-charcoal-line bg-charcoal-deep/70 px-2 py-0.5 text-[10px] uppercase tracking-widest text-ash-400">
-        3D · placeholder
+        demo · animirano
       </span>
 
       <svg
         viewBox="0 0 200 360"
-        className="h-72 w-auto"
+        className={cn("nf-svg h-72 w-auto", `nf-motion-${motion}`)}
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* Subtle outline — translucent body */}
         <g strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round">
-          {/* Head */}
-          <circle
-            cx={100}
-            cy={32}
-            r={20}
-            className="fill-charcoal-line/40 stroke-ash-600/60"
-          />
-          {/* Neck */}
-          <path
-            d="M92 50 L92 62 L108 62 L108 50 Z"
-            className="fill-charcoal-line/40 stroke-ash-600/60"
-          />
+          {/* ── HEAD ──────────────────────────────────────────────────── */}
+          <g data-anim="head" style={{ ["--origin" as string]: "50% 100%" }}>
+            <circle
+              cx={100}
+              cy={32}
+              r={18}
+              className="fill-charcoal-line/50 stroke-ash-600/70"
+            />
+            <path
+              d="M92 48 Q100 56 108 48 L108 60 L92 60 Z"
+              className="fill-charcoal-line/50 stroke-ash-600/70"
+            />
+          </g>
 
-          {/* Torso outline */}
-          <path
-            d="M70 64 Q60 72 60 96 L60 158 Q60 172 68 178 L132 178 Q140 172 140 158 L140 96 Q140 72 130 64 Z"
-            className="fill-charcoal-line/30 stroke-ash-600/60"
-          />
+          {/* ── TORSO (animates as a whole for hinge/squat/flexion/breathe) ── */}
+          <g data-anim="torso">
+            {/* Outline of trunk */}
+            <path
+              d="M72 62 Q60 70 60 96 L60 158 Q60 174 70 180 L130 180 Q140 174 140 158 L140 96 Q140 70 128 62 Z"
+              className="fill-charcoal-line/30 stroke-ash-600/60"
+            />
 
-          {/* Chest */}
-          <path
-            d="M74 78 Q86 70 100 70 Q114 70 126 78 L126 110 Q113 118 100 118 Q87 118 74 110 Z"
-            className={cn(isActive("chest") ? ACTIVE : IDLE)}
-            strokeWidth={1.5}
-          />
-          {/* Shoulders (deltoids) */}
-          <path
-            d="M58 72 Q52 86 56 100 Q66 96 72 86 Z"
-            className={cn(isActive("shoulders") ? ACTIVE : IDLE)}
-          />
-          <path
-            d="M142 72 Q148 86 144 100 Q134 96 128 86 Z"
-            className={cn(isActive("shoulders") ? ACTIVE : IDLE)}
-          />
+            {/* Chest (pectoralis) */}
+            <path
+              d="M76 72 Q88 64 100 64 Q112 64 124 72 L124 108 Q112 116 100 116 Q88 116 76 108 Z"
+              className={muscleClass("chest")}
+              data-active={isActive("chest")}
+            />
 
-          {/* Arms (biceps/triceps grouped) */}
-          <path
-            d="M48 96 L42 158 L52 162 L60 100 Z"
-            className={cn(isActive("arms") ? ACTIVE : IDLE)}
-          />
-          <path
-            d="M152 96 L158 158 L148 162 L140 100 Z"
-            className={cn(isActive("arms") ? ACTIVE : IDLE)}
-          />
-          {/* Forearms */}
-          <path
-            d="M40 162 L36 212 L48 214 L52 164 Z"
-            className="fill-charcoal-line/30 stroke-ash-600/60"
-          />
-          <path
-            d="M160 162 L164 212 L152 214 L148 164 Z"
-            className="fill-charcoal-line/30 stroke-ash-600/60"
-          />
-
-          {/* Core (abs) */}
-          <path
-            d="M82 122 L118 122 L116 170 L84 170 Z"
-            className={cn(isActive("core") ? ACTIVE : IDLE)}
-          />
-
-          {/* Back marker (since this is front view, we show a subtle hint dot) */}
-          {isActive("back") && (
-            <g>
-              <circle
-                cx={100}
-                cy={132}
-                r={5}
-                className="fill-mint/70 stroke-mint"
-              />
-              <text
-                x={108}
-                y={136}
-                className="fill-mint text-[8px]"
-                fontFamily="system-ui"
-              >
-                back
-              </text>
+            {/* Abs (rectus abdominis) — three subtle bands */}
+            <g
+              className={muscleClass("core")}
+              data-active={isActive("core")}
+            >
+              <rect x={84} y={120} width={32} height={14} rx={3} />
+              <rect x={84} y={138} width={32} height={14} rx={3} />
+              <rect x={84} y={156} width={32} height={14} rx={3} />
             </g>
-          )}
 
-          {/* Hips / glutes hint */}
+            {/* Shoulders (anterior deltoid) */}
+            <path
+              d="M58 70 Q52 84 56 100 Q66 96 72 86 Z"
+              className={muscleClass("shoulders")}
+              data-active={isActive("shoulders")}
+            />
+            <path
+              d="M142 70 Q148 84 144 100 Q134 96 128 86 Z"
+              className={muscleClass("shoulders")}
+              data-active={isActive("shoulders")}
+            />
+
+            {/* Back-hint (since we're front view, indicate active back with a marker) */}
+            {isActive("back") && (
+              <g
+                className="fill-mint/70 stroke-mint"
+                data-active="true"
+              >
+                <circle cx={100} cy={140} r={4} />
+                <text
+                  x={108}
+                  y={144}
+                  className="fill-mint text-[8px]"
+                  fontFamily="system-ui"
+                  fontWeight="600"
+                >
+                  back
+                </text>
+              </g>
+            )}
+          </g>
+
+          {/* ── ARMS — left ──────────────────────────────────────────── */}
+          <g
+            data-anim="upperarm-l"
+            style={{ ["--origin" as string]: "50% 0%" }}
+          >
+            <path
+              d="M48 90 L42 156 L56 158 L62 96 Z"
+              className={muscleClass("arms")}
+              data-active={isActive("arms")}
+            />
+            <g data-anim="forearm-l">
+              <path
+                d="M40 158 L36 218 L52 220 L56 160 Z"
+                className="fill-charcoal-line/35 stroke-ash-600/60"
+              />
+            </g>
+          </g>
+
+          {/* ── ARMS — right ─────────────────────────────────────────── */}
+          <g
+            data-anim="upperarm-r"
+            style={{ ["--origin" as string]: "50% 0%" }}
+          >
+            <path
+              d="M152 90 L158 156 L144 158 L138 96 Z"
+              className={muscleClass("arms")}
+              data-active={isActive("arms")}
+            />
+            <g data-anim="forearm-r">
+              <path
+                d="M160 158 L164 218 L148 220 L144 160 Z"
+                className="fill-charcoal-line/35 stroke-ash-600/60"
+              />
+            </g>
+          </g>
+
+          {/* ── HIPS / GLUTES ────────────────────────────────────────── */}
           <path
-            d="M68 178 L132 178 L136 200 L64 200 Z"
-            className={cn(isActive("glutes") ? ACTIVE : IDLE)}
+            d="M68 180 L132 180 L138 204 L62 204 Z"
+            className={muscleClass("glutes")}
+            data-active={isActive("glutes")}
           />
 
-          {/* Quads */}
-          <path
-            d="M68 200 L60 280 L88 282 L94 202 Z"
-            className={cn(isActive("quads") ? ACTIVE : IDLE)}
-          />
-          <path
-            d="M132 200 L140 280 L112 282 L106 202 Z"
-            className={cn(isActive("quads") ? ACTIVE : IDLE)}
-          />
+          {/* ── THIGHS — left ────────────────────────────────────────── */}
+          <g
+            data-anim="thigh-l"
+            style={{ ["--origin" as string]: "50% 0%" }}
+          >
+            <path
+              d="M68 204 L60 282 L88 284 L94 206 Z"
+              className={muscleClass("quads")}
+              data-active={isActive("quads")}
+            />
+            {/* Hamstring marker (rear muscle, hint dot) */}
+            {isActive("hamstrings") && (
+              <circle
+                cx={78}
+                cy={244}
+                r={4}
+                className="fill-mint/70 stroke-mint"
+                data-active="true"
+              />
+            )}
+          </g>
 
-          {/* Hamstrings hint marker */}
-          {isActive("hamstrings") && (
-            <>
-              <circle cx={78} cy={240} r={4} className="fill-mint/70 stroke-mint" />
-              <circle cx={122} cy={240} r={4} className="fill-mint/70 stroke-mint" />
-            </>
-          )}
+          {/* ── THIGHS — right ───────────────────────────────────────── */}
+          <g
+            data-anim="thigh-r"
+            style={{ ["--origin" as string]: "50% 0%" }}
+          >
+            <path
+              d="M132 204 L140 282 L112 284 L106 206 Z"
+              className={muscleClass("quads")}
+              data-active={isActive("quads")}
+            />
+            {isActive("hamstrings") && (
+              <circle
+                cx={122}
+                cy={244}
+                r={4}
+                className="fill-mint/70 stroke-mint"
+                data-active="true"
+              />
+            )}
+          </g>
 
-          {/* Calves */}
+          {/* ── CALVES ────────────────────────────────────────────────── */}
           <path
-            d="M64 282 L60 340 L84 340 L86 284 Z"
-            className={cn(isActive("calves") ? ACTIVE : IDLE)}
+            d="M64 286 L60 342 L84 342 L86 288 Z"
+            className={muscleClass("calves")}
+            data-active={isActive("calves")}
           />
           <path
-            d="M136 282 L140 340 L116 340 L114 284 Z"
-            className={cn(isActive("calves") ? ACTIVE : IDLE)}
+            d="M136 286 L140 342 L116 342 L114 288 Z"
+            className={muscleClass("calves")}
+            data-active={isActive("calves")}
           />
         </g>
       </svg>
 
-      {/* Soft mint glow when any muscle is active */}
+      {/* Soft mint glow overlay */}
       <div className="pointer-events-none absolute inset-0 bg-mint/[0.03] [mask-image:radial-gradient(circle_at_center,black,transparent_70%)]" />
     </div>
   );

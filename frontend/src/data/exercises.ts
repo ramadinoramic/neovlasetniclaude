@@ -43,7 +43,30 @@ export interface Exercise {
   defaultReps: number;
   /** ID of the alternative exercise when gym is crowded. */
   alternativeId: string;
+  /** Drives the SVG animation in LottiePlaceholder. */
+  motion: MotionPattern;
 }
+
+/**
+ * Motion patterns drive the placeholder animation.
+ * - press:    push movement (bench press, push-up) — arms extend/retract
+ * - squat:    bilateral knee/hip flexion (back squat, goblet squat)
+ * - hinge:    posterior chain hip hinge (deadlift, RDL)
+ * - row:      pull movement (db row, inverted row)
+ * - flexion:  spine flexion/extension (cat–cow, dead bug)
+ * - walk:     alternating leg sway (brisk walk)
+ * - hold:     isometric, subtle breathing (plank, WGS)
+ * - still:    no motion, only active-muscle pulse
+ */
+export type MotionPattern =
+  | "press"
+  | "squat"
+  | "hinge"
+  | "row"
+  | "flexion"
+  | "walk"
+  | "hold"
+  | "still";
 
 export const EXERCISES: Record<string, Exercise> = {
   // ─── Strength / Heavy strength ─────────────────────────────────────────────
@@ -65,6 +88,7 @@ export const EXERCISES: Record<string, Exercise> = {
     defaultSets: 4,
     defaultReps: 6,
     alternativeId: "push_up",
+    motion: "press",
   },
   push_up: {
     id: "push_up",
@@ -83,6 +107,7 @@ export const EXERCISES: Record<string, Exercise> = {
     defaultSets: 4,
     defaultReps: 12,
     alternativeId: "bench_press",
+    motion: "press",
   },
 
   back_squat: {
@@ -103,6 +128,7 @@ export const EXERCISES: Record<string, Exercise> = {
     defaultSets: 4,
     defaultReps: 6,
     alternativeId: "goblet_squat",
+    motion: "squat",
   },
   goblet_squat: {
     id: "goblet_squat",
@@ -120,6 +146,7 @@ export const EXERCISES: Record<string, Exercise> = {
     defaultSets: 3,
     defaultReps: 10,
     alternativeId: "back_squat",
+    motion: "squat",
   },
 
   deadlift: {
@@ -140,6 +167,7 @@ export const EXERCISES: Record<string, Exercise> = {
     defaultSets: 3,
     defaultReps: 5,
     alternativeId: "romanian_deadlift_db",
+    motion: "hinge",
   },
   romanian_deadlift_db: {
     id: "romanian_deadlift_db",
@@ -158,6 +186,7 @@ export const EXERCISES: Record<string, Exercise> = {
     defaultSets: 3,
     defaultReps: 10,
     alternativeId: "deadlift",
+    motion: "hinge",
   },
 
   // ─── Balanced ──────────────────────────────────────────────────────────────
@@ -179,6 +208,7 @@ export const EXERCISES: Record<string, Exercise> = {
     defaultSets: 3,
     defaultReps: 10,
     alternativeId: "inverted_row",
+    motion: "row",
   },
   inverted_row: {
     id: "inverted_row",
@@ -197,6 +227,7 @@ export const EXERCISES: Record<string, Exercise> = {
     defaultSets: 3,
     defaultReps: 10,
     alternativeId: "db_row",
+    motion: "row",
   },
 
   // ─── Light cardio / Mobility ───────────────────────────────────────────────
@@ -216,6 +247,7 @@ export const EXERCISES: Record<string, Exercise> = {
     defaultSets: 2,
     defaultReps: 10,
     alternativeId: "world_greatest_stretch",
+    motion: "flexion",
   },
   world_greatest_stretch: {
     id: "world_greatest_stretch",
@@ -233,6 +265,7 @@ export const EXERCISES: Record<string, Exercise> = {
     defaultSets: 2,
     defaultReps: 6,
     alternativeId: "cat_cow",
+    motion: "hold",
   },
 
   brisk_walk: {
@@ -251,6 +284,7 @@ export const EXERCISES: Record<string, Exercise> = {
     defaultSets: 1,
     defaultReps: 1,
     alternativeId: "cat_cow",
+    motion: "walk",
   },
 
   plank: {
@@ -269,6 +303,7 @@ export const EXERCISES: Record<string, Exercise> = {
     defaultSets: 3,
     defaultReps: 1,
     alternativeId: "dead_bug",
+    motion: "hold",
   },
   dead_bug: {
     id: "dead_bug",
@@ -286,6 +321,7 @@ export const EXERCISES: Record<string, Exercise> = {
     defaultSets: 3,
     defaultReps: 8,
     alternativeId: "plank",
+    motion: "flexion",
   },
 };
 
@@ -315,3 +351,27 @@ export function getExercise(id: string): Exercise {
 export function getTrack(mode: WorkoutMode): Exercise[] {
   return WORKOUT_TRACKS[mode].map(getExercise);
 }
+
+export const ALL_EXERCISES: Exercise[] = Object.values(EXERCISES);
+
+export const MUSCLE_LABEL: Record<MuscleGroup, string> = {
+  chest: "Prsa",
+  back: "Leđa",
+  shoulders: "Ramena",
+  arms: "Ruke",
+  core: "Trbuh",
+  glutes: "Glutei",
+  quads: "Kvadricepsi",
+  hamstrings: "Stražnja loža",
+  calves: "Listovi",
+  full_body: "Cijelo tijelo",
+};
+
+export const EQUIPMENT_LABEL: Record<Exercise["equipment"], string> = {
+  bodyweight: "Bez opreme",
+  barbell: "Šipka",
+  dumbbell: "Bučice",
+  machine: "Sprava",
+  bench: "Klupa",
+  mat: "Strunjača",
+};
