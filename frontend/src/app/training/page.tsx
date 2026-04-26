@@ -1,14 +1,26 @@
-export default function TrainingPage() {
-  return (
-    <section className="flex flex-col gap-4 animate-fade-in">
-      <span className="text-xs uppercase tracking-[0.25em] text-ash-400">
-        SafeSpace Trening
-      </span>
-      <h1 className="text-2xl font-semibold">Uskoro.</h1>
-      <p className="text-sm text-ash-200">
-        Ekran s vježbama, Lottie animacijama i gumbom &quot;Gužva je&quot; dolazi
-        u sljedećoj iteraciji.
-      </p>
-    </section>
-  );
+import { SafeSpaceTraining } from "@/components/training/SafeSpaceTraining";
+import type { WorkoutMode } from "@/data/exercises";
+
+const VALID_MODES: WorkoutMode[] = [
+  "mobility",
+  "light_cardio",
+  "balanced",
+  "strength",
+  "heavy_strength",
+];
+
+function parseMode(raw: string | string[] | undefined): WorkoutMode {
+  const value = Array.isArray(raw) ? raw[0] : raw;
+  return VALID_MODES.includes(value as WorkoutMode)
+    ? (value as WorkoutMode)
+    : "balanced";
+}
+
+export default function TrainingPage({
+  searchParams,
+}: {
+  searchParams: { mode?: string };
+}) {
+  const mode = parseMode(searchParams.mode);
+  return <SafeSpaceTraining mode={mode} />;
 }

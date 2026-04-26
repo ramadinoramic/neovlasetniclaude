@@ -111,7 +111,17 @@ uvicorn app.main:app --reload --port 8000
 - [x] Dnevni Check-in (slider 1–5 + "Neovlašteni" odgovor)
 - [x] Backend skeleton + `POST /api/check-in`
 - [x] Smart Fridge servis (OpenAI prompt)
-- [ ] SafeSpace Trening ekran (Lottie + "Gužva je" alternativa)
+- [x] SafeSpace Trening ekran (Lottie placeholder + "Gužva je" alternativa + set logger)
 - [ ] Smart Fridge frontend ekran
+- [ ] Prave Lottie 3D animacije (zamjena placeholdera)
 - [ ] PostgreSQL migracije (Alembic)
 - [ ] Service worker + offline shell
+
+### SafeSpace Trening — kako radi
+
+- `/check-in` zapisuje preporuku i ruta na `/training?mode=<track>`.
+- Vježbe i klinički-točne upute žive u `frontend/src/data/exercises.ts`.
+- Po modu se učita "track" od 3 vježbe (`WORKOUT_TRACKS`).
+- **"Gužva je"** mijenja trenutnu vježbu na `alternativeId` (npr. bench press → sklekovi); ponovni klik vraća original.
+- Set logger sprema serije po vježbi u `localStorage` (`nf:sets:<exerciseId>`).
+- Bodyweight vježbe automatski sakrivaju polje za kilažu.
