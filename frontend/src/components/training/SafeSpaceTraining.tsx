@@ -2,37 +2,49 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import {
-  MODE_LABEL,
-  type WorkoutMode,
-  getExercise,
-  getTrack,
-} from "@/data/exercises";
+import { getExercise, type Exercise } from "@/data/exercises";
 import { ExerciseInstructions } from "./ExerciseInstructions";
-import { LottiePlaceholder } from "./LottiePlaceholder";
+import { MuscleMap } from "./MuscleMap";
 import { SetLogger } from "./SetLogger";
 import { CrowdedButton } from "./CrowdedButton";
 import { ExercisePicker } from "./ExercisePicker";
 import { cn } from "@/lib/cn";
 
-interface SafeSpaceTrainingProps {
-  mode: WorkoutMode;
+export interface SessionStep {
+  exerciseId: string;
+  sets: number;
+  reps: string;
+  restSec: number;
+  rpe?: number;
 }
 
-/**
- * Per-step override map. Key = step index, value = exerciseId user picked.
- * If absent, we fall back to the default `track[stepIdx]`.
- */
+interface SafeSpaceTrainingProps {
+  /** Session metadata (used in header). */
+  title: string;
+  subtitle?: string;
+  /** Ordered list of exercises with per-step scheme. */
+  steps: SessionStep[];
+  /** Where "Završio sam" should go. */
+  exitHref?: string;
+}
+
 type Overrides = Record<number, string>;
 
-export function SafeSpaceTraining({ mode }: SafeSpaceTrainingProps) {
-  const track = useMemo(() => getTrack(mode), [mode]);
-
+export function SafeSpaceTraining({
+  title,
+  subtitle,
+  steps,
+  exitHref = "/",
+}: SafeSpaceTrainingProps) {
   const [stepIdx, setStepIdx] = useState(0);
   const [overrides, setOverrides] = useState<Overrides>({});
   const [pickerOpen, setPickerOpen] = useState(false);
 
-  const baseExercise = track[stepIdx];
+  const baseStep = steps[stepIdx];
+  const baseExercise = useMemo<Exercise>(
+    () => getExercise(baseStep.exerciseId),
+    [baseStep.exerciseId]
+  );
   const overrideId = overrides[stepIdx];
   const exercise = overrideId ? getExercise(overrideId) : baseExercise;
   const isOverridden = Boolean(overrideId);
@@ -53,34 +65,32 @@ export function SafeSpaceTraining({ mode }: SafeSpaceTrainingProps) {
     else setOverride(baseExercise.alternativeId);
   };
 
-  const goNext = () => {
-    setStepIdx((i) => Math.min(i + 1, track.length - 1));
-  };
-  const goPrev = () => {
-    setStepIdx((i) => Math.max(i - 1, 0));
-  };
+  const goNext = () =>
+    setStepIdx((i) => Math.min(i + 1, steps.length - 1));
+  const goPrev = () => setStepIdx((i) => Math.max(i - 1, 0));
 
-  const isLast = stepIdx === track.length - 1;
-  const progress = ((stepIdx + 1) / track.length) * 100;
+  const isLast = stepIdx === steps.length - 1;
+  const progress = ((stepIdx + 1) / steps.length) * 100;
 
   return (
     <section className="flex flex-col gap-6 animate-fade-in">
-      {/* Header — UI ton (Neovlašteni) */}
       <header className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <span className="text-xs uppercase tracking-[0.25em] text-ash-400">
-            SafeSpace Trening
+            {title}
           </span>
           <span className="text-[10px] uppercase tracking-widest text-ash-600">
-            {stepIdx + 1} / {track.length}
+            {stepIdx + 1} / {steps.length}
           </span>
         </div>
-        <h1 className="text-2xl font-semibold leading-tight">
-          {MODE_LABEL[mode]}.
-          <span className="block text-ash-400 text-base font-normal mt-1">
-            Bez ogledala. Bez ega. Idemo redom.
-          </span>
-        </h1>
+        {subtitle && (
+          <h1 className="text-2xl font-semibold leading-tight">
+            {subtitle}
+            <span className="block text-ash-400 text-base font-normal mt-1">
+              Bez ogledala. Bez ega. Idemo redom.
+            </span>
+          </h1>
+        )}
         <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-charcoal-soft">
           <div
             className="h-full bg-mint transition-all duration-500"
@@ -89,7 +99,6 @@ export function SafeSpaceTraining({ mode }: SafeSpaceTrainingProps) {
         </div>
       </header>
 
-      {/* Exercise card */}
       <article key={exercise.id} className="flex flex-col gap-5 animate-fade-in">
         <div className="flex items-baseline justify-between gap-3">
           <h2 className="text-lg font-semibold text-ash-50">{exercise.name}</h2>
@@ -100,13 +109,12 @@ export function SafeSpaceTraining({ mode }: SafeSpaceTrainingProps) {
           )}
         </div>
 
-        <LottiePlaceholder
-          muscles={exercise.primaryMuscles}
-          motion={exercise.motion}
+        <MuscleMap
+          primary={exercise.primaryMuscles}
+          secondary={exercise.secondaryMuscles}
           exerciseName={exercise.name}
         />
 
-        {/* Action row: Crowded swap + open full picker */}
         <div className="grid grid-cols-1 gap-2.5">
           <CrowdedButton
             swapped={isAlternative}
@@ -148,13 +156,14 @@ export function SafeSpaceTraining({ mode }: SafeSpaceTrainingProps) {
 
         <SetLogger
           exerciseId={exercise.id}
-          defaultSets={exercise.defaultSets}
-          defaultReps={exercise.defaultReps}
+          defaultSets={baseStep.sets}
+          defaultReps={baseStep.reps}
+          restSec={baseStep.restSec}
+          rpe={baseStep.rpe}
           bodyweight={exercise.equipment === "bodyweight"}
         />
       </article>
 
-      {/* Navigation between exercises in the track */}
       <nav className="grid grid-cols-2 gap-3">
         <button
           type="button"
@@ -171,7 +180,7 @@ export function SafeSpaceTraining({ mode }: SafeSpaceTrainingProps) {
         </button>
         {isLast ? (
           <Link
-            href="/"
+            href={exitHref}
             className="rounded-xl bg-mint px-4 py-3 text-center text-sm font-medium text-charcoal-deep transition hover:bg-mint-glow"
           >
             Završio sam ✓

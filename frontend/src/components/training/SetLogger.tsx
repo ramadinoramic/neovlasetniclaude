@@ -4,16 +4,18 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 
 export interface LoggedSet {
-  reps: number;
+  reps: string;
   weightKg: number;
+  rpe?: number;
   done: boolean;
 }
 
 interface SetLoggerProps {
   exerciseId: string;
   defaultSets: number;
-  defaultReps: number;
-  /** Bodyweight exercises hide weight input. */
+  defaultReps: string;
+  restSec: number;
+  rpe?: number;
   bodyweight?: boolean;
 }
 
@@ -22,7 +24,7 @@ const STORAGE_PREFIX = "nf:sets:";
 function loadSets(
   exerciseId: string,
   defaultSets: number,
-  defaultReps: number
+  defaultReps: string
 ): LoggedSet[] {
   if (typeof window === "undefined") {
     return Array.from({ length: defaultSets }, () => ({
@@ -37,7 +39,7 @@ function loadSets(
       const parsed = JSON.parse(raw) as LoggedSet[];
       if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     } catch {
-      // fall through to defaults
+      // fall through
     }
   }
   return Array.from({ length: defaultSets }, () => ({
@@ -51,6 +53,8 @@ export function SetLogger({
   exerciseId,
   defaultSets,
   defaultReps,
+  restSec,
+  rpe,
   bodyweight = false,
 }: SetLoggerProps) {
   const [sets, setSets] = useState<LoggedSet[]>(() =>
@@ -72,8 +76,7 @@ export function SetLogger({
   const updateSet = (idx: number, patch: Partial<LoggedSet>) => {
     setSets((prev) => prev.map((s, i) => (i === idx ? { ...s, ...patch } : s)));
   };
-
-  const addSet = () => {
+  const addSet = () =>
     setSets((prev) => [
       ...prev,
       {
@@ -82,11 +85,8 @@ export function SetLogger({
         done: false,
       },
     ]);
-  };
-
-  const removeSet = (idx: number) => {
+  const removeSet = (idx: number) =>
     setSets((prev) => (prev.length > 1 ? prev.filter((_, i) => i !== idx) : prev));
-  };
 
   return (
     <section
@@ -97,15 +97,32 @@ export function SetLogger({
         <h3 className="text-xs uppercase tracking-[0.25em] text-ash-400">
           Serije
         </h3>
-        <span className="text-[10px] uppercase tracking-widest text-ash-600">
-          {sets.filter((s) => s.done).length} / {sets.length}
-        </span>
+        <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-ash-600">
+          <span>
+            {sets.filter((s) => s.done).length} / {sets.length}
+          </span>
+          {restSec > 0 && (
+            <>
+              <span>·</span>
+              <span>Pauza {restSec}s</span>
+            </>
+          )}
+          {rpe !== undefined && (
+            <>
+              <span>·</span>
+              <span className="text-mint">RPE {rpe}</span>
+            </>
+          )}
+        </div>
       </header>
 
       <div className="grid grid-cols-12 gap-2 px-1 pb-2 text-[10px] uppercase tracking-widest text-ash-400">
         <div className="col-span-1">#</div>
-        <div className={cn(bodyweight ? "col-span-9" : "col-span-5")}>Ponavljanja</div>
-        {!bodyweight && <div className="col-span-4">Kilaža (kg)</div>}
+        <div className={cn(bodyweight ? "col-span-7" : "col-span-4")}>
+          Ponavljanja
+        </div>
+        {!bodyweight && <div className="col-span-3">Kg</div>}
+        <div className="col-span-2">RPE</div>
         <div className="col-span-2 text-right">✓</div>
       </div>
 
@@ -121,22 +138,17 @@ export function SetLogger({
             )}
           >
             <div className="col-span-1 text-sm text-ash-400">{idx + 1}</div>
-
-            <div className={cn(bodyweight ? "col-span-9" : "col-span-5")}>
+            <div className={cn(bodyweight ? "col-span-7" : "col-span-4")}>
               <input
-                type="number"
+                type="text"
                 inputMode="numeric"
-                min={0}
                 value={s.reps}
-                onChange={(e) =>
-                  updateSet(idx, { reps: Number(e.target.value) || 0 })
-                }
-                className="w-full rounded-lg border border-charcoal-line bg-charcoal-deep px-3 py-2 text-sm text-ash-50 outline-none focus:border-mint"
+                onChange={(e) => updateSet(idx, { reps: e.target.value })}
+                className="w-full rounded-lg border border-charcoal-line bg-charcoal-deep px-2 py-2 text-sm text-ash-50 outline-none focus:border-mint"
               />
             </div>
-
             {!bodyweight && (
-              <div className="col-span-4">
+              <div className="col-span-3">
                 <input
                   type="number"
                   inputMode="decimal"
@@ -146,11 +158,27 @@ export function SetLogger({
                   onChange={(e) =>
                     updateSet(idx, { weightKg: Number(e.target.value) || 0 })
                   }
-                  className="w-full rounded-lg border border-charcoal-line bg-charcoal-deep px-3 py-2 text-sm text-ash-50 outline-none focus:border-mint"
+                  className="w-full rounded-lg border border-charcoal-line bg-charcoal-deep px-2 py-2 text-sm text-ash-50 outline-none focus:border-mint"
                 />
               </div>
             )}
-
+            <div className="col-span-2">
+              <input
+                type="number"
+                inputMode="numeric"
+                min={1}
+                max={10}
+                value={s.rpe ?? ""}
+                placeholder={rpe ? String(rpe) : "—"}
+                onChange={(e) => {
+                  const v = Number(e.target.value);
+                  updateSet(idx, {
+                    rpe: Number.isFinite(v) && v > 0 ? v : undefined,
+                  });
+                }}
+                className="w-full rounded-lg border border-charcoal-line bg-charcoal-deep px-2 py-2 text-sm text-ash-50 outline-none focus:border-mint"
+              />
+            </div>
             <div className="col-span-2 flex items-center justify-end gap-1">
               <button
                 type="button"
