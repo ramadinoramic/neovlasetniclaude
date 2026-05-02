@@ -2,7 +2,7 @@
 
 import { Suspense, useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { ContactShadows, Environment, OrbitControls } from "@react-three/drei";
+import { ContactShadows, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import type { MuscleGroup } from "@/data/exercises";
 import { MUSCLE_LABEL } from "@/data/exercises";
@@ -81,7 +81,6 @@ export function MuscleMap3D({
         >
           <Lighting />
           <Suspense fallback={null}>
-            <Environment preset="studio" background={false} />
             <BodyRig intensityFor={intensityFor} />
             <ContactShadows
               position={[0, -0.95, 0]}
@@ -122,28 +121,21 @@ export function MuscleMap3D({
 function Lighting() {
   return (
     <>
-      <ambientLight intensity={0.35} />
+      <ambientLight intensity={0.7} />
       {/* Key light — top right */}
-      <directionalLight
-        position={[3, 5, 4]}
-        intensity={1.1}
-        color="#FFFFFF"
-        castShadow
-      />
-      {/* Fill light — top left, cool */}
+      <directionalLight position={[3, 5, 4]} intensity={1.4} color="#FFFFFF" />
+      {/* Fill light — top left */}
       <directionalLight
         position={[-3, 3, 2]}
-        intensity={0.4}
+        intensity={0.7}
         color="#A6F0CE"
       />
-      {/* Rim light — back, for silhouette */}
-      <directionalLight
-        position={[0, 2, -4]}
-        intensity={0.6}
-        color="#FFFFFF"
-      />
-      {/* Subtle accent point */}
-      <pointLight position={[0, 0.8, 2]} intensity={0.3} color="#A892E8" />
+      {/* Rim light — back, silhouette */}
+      <directionalLight position={[0, 2, -4]} intensity={0.9} color="#FFFFFF" />
+      {/* Front fill */}
+      <pointLight position={[0, 0.8, 3]} intensity={0.6} color="#FFFFFF" />
+      {/* Violet accent */}
+      <pointLight position={[2, 0, 1]} intensity={0.3} color="#A892E8" />
     </>
   );
 }
