@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { getExercise, type Exercise } from "@/data/exercises";
 import { ExerciseInstructions } from "./ExerciseInstructions";
-import { MuscleMap } from "./MuscleMap";
+import { MuscleMap3D } from "./MuscleMap3D";
 import { SetLogger } from "./SetLogger";
 import { CrowdedButton } from "./CrowdedButton";
 import { ExercisePicker } from "./ExercisePicker";
@@ -109,7 +109,7 @@ export function SafeSpaceTraining({
           )}
         </div>
 
-        <MuscleMap
+        <MuscleMap3D
           primary={exercise.primaryMuscles}
           secondary={exercise.secondaryMuscles}
           exerciseName={exercise.name}
