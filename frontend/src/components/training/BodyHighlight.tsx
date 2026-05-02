@@ -42,78 +42,82 @@ interface Zone {
 
 /**
  * Anatomical zones (% coordinates).
- * Calibrated for a generic standing-T-pose anatomy chart, body fills ~85%
- * of frame, head at top, feet at bottom.
+ * Calibrated for `front.png` and `back.png` from /public/anatomy/
+ * (1254×1254 square, body fills ~95% of frame vertically, head at top
+ * y≈5%, feet at y≈96%, shoulder line y≈17%).
  */
 const ZONES: Partial<Record<MuscleGroup, Zone[]>> = {
   // ── FRONT ───────────────────────────────────────────────────────────────
-  chest: [{ side: "front", top: 21, left: 33, w: 34, h: 11 }],
+  chest: [
+    { side: "front", top: 21, left: 35, w: 14, h: 11 },
+    { side: "front", top: 21, left: 51, w: 14, h: 11 },
+  ],
   shoulders_front: [
-    { side: "front", top: 18, left: 21, w: 14, h: 9 },
-    { side: "front", top: 18, left: 65, w: 14, h: 9 },
+    { side: "front", top: 17, left: 24, w: 12, h: 9 },
+    { side: "front", top: 17, left: 64, w: 12, h: 9 },
   ],
   shoulders_side: [
-    { side: "front", top: 19, left: 14, w: 8, h: 11 },
-    { side: "front", top: 19, left: 78, w: 8, h: 11 },
+    { side: "front", top: 19, left: 17, w: 8, h: 10 },
+    { side: "front", top: 19, left: 75, w: 8, h: 10 },
   ],
   biceps: [
-    { side: "front", top: 28, left: 16, w: 9, h: 13 },
-    { side: "front", top: 28, left: 75, w: 9, h: 13 },
+    { side: "front", top: 26, left: 17, w: 9, h: 13 },
+    { side: "front", top: 26, left: 74, w: 9, h: 13 },
   ],
   forearms: [
-    { side: "front", top: 41, left: 11, w: 9, h: 14 },
-    { side: "front", top: 41, left: 80, w: 9, h: 14 },
-    { side: "back", top: 41, left: 11, w: 9, h: 14 },
-    { side: "back", top: 41, left: 80, w: 9, h: 14 },
+    { side: "front", top: 38, left: 11, w: 9, h: 14 },
+    { side: "front", top: 38, left: 80, w: 9, h: 14 },
+    { side: "back", top: 38, left: 11, w: 9, h: 14 },
+    { side: "back", top: 38, left: 80, w: 9, h: 14 },
   ],
-  abs: [{ side: "front", top: 33, left: 41, w: 18, h: 19 }],
+  abs: [{ side: "front", top: 32, left: 41, w: 18, h: 16 }],
   obliques: [
-    { side: "front", top: 33, left: 30, w: 10, h: 18 },
-    { side: "front", top: 33, left: 60, w: 10, h: 18 },
+    { side: "front", top: 32, left: 33, w: 8, h: 15 },
+    { side: "front", top: 32, left: 59, w: 8, h: 15 },
   ],
   quads: [
-    { side: "front", top: 56, left: 30, w: 17, h: 22 },
-    { side: "front", top: 56, left: 53, w: 17, h: 22 },
+    { side: "front", top: 55, left: 30, w: 18, h: 17 },
+    { side: "front", top: 55, left: 52, w: 18, h: 17 },
   ],
   adductors: [
-    { side: "front", top: 56, left: 43, w: 7, h: 22 },
-    { side: "front", top: 56, left: 50, w: 7, h: 22 },
+    { side: "front", top: 56, left: 44, w: 6, h: 16 },
+    { side: "front", top: 56, left: 50, w: 6, h: 16 },
   ],
   // ── BACK ────────────────────────────────────────────────────────────────
-  traps: [{ side: "back", top: 16, left: 36, w: 28, h: 9 }],
+  traps: [{ side: "back", top: 17, left: 36, w: 28, h: 11 }],
   shoulders_rear: [
-    { side: "back", top: 18, left: 21, w: 14, h: 9 },
-    { side: "back", top: 18, left: 65, w: 14, h: 9 },
+    { side: "back", top: 17, left: 24, w: 12, h: 9 },
+    { side: "back", top: 17, left: 64, w: 12, h: 9 },
   ],
   triceps: [
-    { side: "back", top: 28, left: 16, w: 9, h: 14 },
-    { side: "back", top: 28, left: 75, w: 9, h: 14 },
+    { side: "back", top: 26, left: 17, w: 9, h: 13 },
+    { side: "back", top: 26, left: 74, w: 9, h: 13 },
   ],
   lats: [
-    { side: "back", top: 26, left: 25, w: 14, h: 18 },
-    { side: "back", top: 26, left: 61, w: 14, h: 18 },
+    { side: "back", top: 26, left: 27, w: 13, h: 16 },
+    { side: "back", top: 26, left: 60, w: 13, h: 16 },
   ],
-  lower_back: [{ side: "back", top: 41, left: 38, w: 24, h: 11 }],
+  lower_back: [{ side: "back", top: 37, left: 40, w: 20, h: 9 }],
   glutes: [
-    { side: "back", top: 50, left: 28, w: 19, h: 13 },
-    { side: "back", top: 50, left: 53, w: 19, h: 13 },
+    { side: "back", top: 46, left: 30, w: 18, h: 13 },
+    { side: "back", top: 46, left: 52, w: 18, h: 13 },
   ],
   hamstrings: [
-    { side: "back", top: 60, left: 30, w: 17, h: 20 },
-    { side: "back", top: 60, left: 53, w: 17, h: 20 },
+    { side: "back", top: 58, left: 30, w: 18, h: 14 },
+    { side: "back", top: 58, left: 52, w: 18, h: 14 },
   ],
   // ── BOTH SIDES ──────────────────────────────────────────────────────────
   calves: [
-    { side: "front", top: 80, left: 32, w: 12, h: 14 },
-    { side: "front", top: 80, left: 56, w: 12, h: 14 },
-    { side: "back", top: 80, left: 32, w: 12, h: 14 },
-    { side: "back", top: 80, left: 56, w: 12, h: 14 },
+    { side: "front", top: 75, left: 33, w: 12, h: 14 },
+    { side: "front", top: 75, left: 55, w: 12, h: 14 },
+    { side: "back", top: 75, left: 33, w: 12, h: 14 },
+    { side: "back", top: 75, left: 55, w: 12, h: 14 },
   ],
 };
 
 const FULL_BODY_ZONES: Zone[] = [
-  { side: "front", top: 18, left: 30, w: 40, h: 64 },
-  { side: "back", top: 18, left: 30, w: 40, h: 64 },
+  { side: "front", top: 8, left: 22, w: 56, h: 88 },
+  { side: "back", top: 8, left: 22, w: 56, h: 88 },
 ];
 
 export function BodyHighlight({
@@ -199,7 +203,7 @@ function BodySide({ side, primary, secondary }: BodySideProps) {
       <span className="absolute left-1 top-1 z-20 text-[9px] uppercase tracking-widest text-ash-600">
         {side}
       </span>
-      <div className="relative aspect-[2/3] w-full overflow-hidden rounded-xl bg-charcoal-deep/60">
+      <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-charcoal-deep/60">
         {!imgFailed ? (
           <img
             src={`/anatomy/${side}.png`}
